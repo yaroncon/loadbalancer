@@ -29,7 +29,7 @@ public class ServerPinger {
 
     private static final Logger LOG = LoggerFactory.getLogger(ServerPinger.class);
 
-    private static final String PATH_TO_IS_ALIVE_SERVICE = "/agent/rinku/check-is-alive";
+    private static final String PATH_TO_IS_ALIVE_SERVICE = "/check-is-alive";
     private static final String SERVER_IS_ALIVE = "Running";
 
     private final LoadBalancer loadBalancer;
