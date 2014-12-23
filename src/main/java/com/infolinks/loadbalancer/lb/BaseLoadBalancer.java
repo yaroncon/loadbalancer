@@ -10,6 +10,7 @@ import com.infolinks.loadbalancer.lb.pinging.PingTask;
 import com.infolinks.loadbalancer.lb.statistics.LoadBalancerStatisticsImpl;
 import com.infolinks.loadbalancer.api.MonitorResult;
 
+import com.infolinks.loadbalancer.utils.PropertiesAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,26 +32,23 @@ public class BaseLoadBalancer implements LoadBalancer {
     private final boolean createServersPingers;
 
     private ArrayList<Server> servers = new ArrayList<Server>();
-
     private Rule rule = new RoundRobinRule(this);
-
     private ArrayList<Server> availableServers = new ArrayList<Server>();
     private ArrayList<Server> allServers = new ArrayList<Server>();
-
     protected LoadBalancerStatistics lbStats;
-
     protected ScheduledExecutorService scheduler = null;
-
     protected int PING_INTERVAL_SECONDS = 10;
-
     protected int PING_INITIAL_DELAY_SECONDS = 30;
+    private PropertiesAccessor config = null;
 
     private static final String PINGER_THREAD_NAME_PREFIX = "LoadBalancer-ServerPinger-";
 
-    public BaseLoadBalancer( Map<Integer, Integer> failedRequestsCountersConfig,
+    public BaseLoadBalancer( PropertiesAccessor config,
+                             Map<Integer, Integer> failedRequestsCountersConfig,
                              Map<Integer, Integer> successfulRequestsCountersConfig, boolean createServersPingers ) {
 
-        lbStats = new LoadBalancerStatisticsImpl(failedRequestsCountersConfig, successfulRequestsCountersConfig);
+        this.config = config;
+        this.lbStats = new LoadBalancerStatisticsImpl(failedRequestsCountersConfig, successfulRequestsCountersConfig);
         this.createServersPingers = createServersPingers;
     }
 
@@ -167,6 +165,11 @@ public class BaseLoadBalancer implements LoadBalancer {
     public MonitorResult getSystemMonitor()
     {
         return this.lbStats.getSystemMonitor();
+    }
+
+    @Override
+    public PropertiesAccessor getConfiguration() {
+        return this.config;
     }
 
     private void evaluateActiveServers() {

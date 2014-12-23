@@ -1,5 +1,7 @@
 package com.infolinks.loadbalancer.api;
 
+import com.infolinks.loadbalancer.utils.PropertiesAccessor;
+
 import java.util.List;
 
 /**
@@ -68,7 +70,7 @@ public interface LoadBalancer {
      *
      * @param server Server to mark as up
      */
-    void markServerUpByStatistics(Server server);
+    public void markServerUpByStatistics(Server server);
 
 
     /**
@@ -109,4 +111,6 @@ public interface LoadBalancer {
     public String reportStatus();
 
     public MonitorResult getSystemMonitor();
+
+    public PropertiesAccessor getConfiguration();
 }

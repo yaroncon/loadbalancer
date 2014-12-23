@@ -34,11 +34,8 @@ public class ServerGroupManager {
 
     private static final String DEFAULT_FAILED_REQUESTS_COUNTER_CONFIG = "[5,60],[10,300],[20,900]";
     private static final String DEFAULT_SUCCESSFUL_REQUESTS_COUNTER_CONFIG = "[10,600]";
-
     private static final String FAILED_REQUESTS_COUNTERS_CONFIG_DB_KEY = "requests.counters.failed";
-
     private static final String SUCCESSFUL_REQUESTS_COUNTERS_CONFIG_DB_KEY = "requests.counters.successful.isAlive";
-
     private static final String CREATE_SERVERS_PINGERS = "create.servers.pingers";
 
     private static final String SERVER_IDENTIFIER = "lbServer.";
@@ -68,7 +65,7 @@ public class ServerGroupManager {
                     String baseUri = key.substring(SERVER_IDENTIFIER.length());
                     LOG.info("loading/reloading Load Balancer list of servers for {}", baseUri);
                     LoadBalancer lb =
-                            new BaseLoadBalancer(failedRequestsCountersConfig, successfulRequestsCountersConfig, createServersPingers);
+                            new BaseLoadBalancer(config, failedRequestsCountersConfig, successfulRequestsCountersConfig, createServersPingers);
                     lb.setServers(extractServerListFrom(config.get(key, String.class)));
                     tempBalancers.put(baseUri, lb);
                 }

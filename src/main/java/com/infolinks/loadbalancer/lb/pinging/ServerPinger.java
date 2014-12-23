@@ -7,7 +7,7 @@ package com.infolinks.loadbalancer.lb.pinging;
 
 import com.infolinks.loadbalancer.api.LoadBalancer;
 import com.infolinks.loadbalancer.api.Server;
-import com.infolinks.loadbalancer.client.LoadBalancedHttpClient;
+import com.infolinks.loadbalancer.utils.PropertiesAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -29,18 +29,23 @@ public class ServerPinger {
 
     private static final Logger LOG = LoggerFactory.getLogger(ServerPinger.class);
 
+    private static final String SERVER_IS_ALIVE_MESSAGE = "Running";
     private static final String PATH_TO_IS_ALIVE_SERVICE = "/check-is-alive";
-    private static final String SERVER_IS_ALIVE = "Running";
-
+    private String serverIsAliveMessage = SERVER_IS_ALIVE_MESSAGE;
+    private String pathToIsAliveService = PATH_TO_IS_ALIVE_SERVICE;
     private final LoadBalancer loadBalancer;
-
     private final Server server;
-
     private static final int PINGER_CONNECTION_TIMEOUT = 10000;
 
     public ServerPinger(LoadBalancer loadBalancer, Server server) {
         this.loadBalancer = loadBalancer;
         this.server = server;
+        PropertiesAccessor config = this.loadBalancer.getConfiguration();
+        if (config != null)
+        {
+            this.pathToIsAliveService = config.get("server.pinger.is.alive.path", String.class, PATH_TO_IS_ALIVE_SERVICE);
+            this.serverIsAliveMessage = config.get("server.pinger.is.alive.message", String.class, SERVER_IS_ALIVE_MESSAGE);
+        }
     }
 
     public synchronized void runPinger() {
@@ -101,7 +106,7 @@ public class ServerPinger {
         String response = null;
         try {
             response = invokeEndpoint("http://" + currentServer.getHostPort() + PATH_TO_IS_ALIVE_SERVICE);
-            if (response.contains(SERVER_IS_ALIVE)) {
+            if (response.contains(SERVER_IS_ALIVE_MESSAGE)) {
                 return true;
             } else {
                 return false;
